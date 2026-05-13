@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn(); // Relaxing email_verified check just in case
+    }
+
+    function isValidScoreEntry(data) {
+      return data.keys().hasAll(['userId', 'displayName', 'topic', 'score', 'totalQuestions', 'difficulty', 'timestamp']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.displayName is string &&
+             data.topic is string &&
+             data.score is number && data.score >= 0 &&
+             data.totalQuestions is number && data.totalQuestions > 0 &&
+             data.difficulty is string &&
+             data.timestamp == request.time;
+    }
+
+    match /leaderboard/{scoreId} {
+      // Allow reading scores for leaderboard display.
+      allow read: if true;
+
+      allow create: if isSignedIn() && isValidScoreEntry(incoming());
+      // No updates or deletes allowed for scores once submitted to ensure integrity
+      allow update, delete: if false;
+    }
+  }
+}

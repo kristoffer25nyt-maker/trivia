@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "ScoreEntry": {
+      "title": "Score Entry",
+      "description": "A player's completed game score",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "topic": { "type": "string" },
+        "score": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "difficulty": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["userId", "displayName", "topic", "score", "totalQuestions", "difficulty", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/leaderboard/{scoreId}": {
+      "schema": { "$ref": "#/entities/ScoreEntry" },
+      "description": "Global leaderboard scores"
+    }
+  }
+}

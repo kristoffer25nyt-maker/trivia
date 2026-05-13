@@ -1,0 +1,6 @@
+{
+  "name": "PersonaTrivia",
+  "description": "A dynamic trivia game featuring an AI host with a user-chosen personality.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
